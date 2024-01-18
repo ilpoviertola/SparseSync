@@ -31,7 +31,7 @@ class GreatestHitDataset(Dataset):
         sample_rate_video: float = 25.0,
         run_additional_checks: bool = True,
         load_fixed_offsets_on_test=True,
-        vis_load_backend="read_video",  # unused
+        **kwargs,
     ) -> None:
         super().__init__()
         self.split = split
@@ -91,8 +91,8 @@ class GreatestHitDataset(Dataset):
             pass  # for now
 
     def __getitem__(self, index) -> dict:
-        path = self.dataset[index]
-        rgb, audio, meta = self.load_media(path)
+        path = self.data_path / Path(self.dataset[index])
+        rgb, audio, meta = self.load_media(path.as_posix())
         item = self.make_datapoint(path, rgb, audio, meta)
         if self.transforms is not None:
             item = self.transforms(item)
@@ -122,13 +122,13 @@ class GreatestHitDataset(Dataset):
         }
 
         # loading the fixed offsets. COMMENT THIS IF YOU DON'T HAVE A FILE YET
-        if self.load_fixed_offsets_on_test and self.split in ["valid", "test"]:
-            item["targets"]["offset_sec"] = self.vid2offset_params[
-                str(Path(path).stem)
-            ]["offset_sec"]
-            item["targets"]["v_start_i_sec"] = self.vid2offset_params[
-                str(Path(path).stem)
-            ]["v_start_i_sec"]
+        # if self.load_fixed_offsets_on_test and self.split in ["valid", "test"]:
+        #     item["targets"]["offset_sec"] = self.vid2offset_params[
+        #         str(Path(path).stem)
+        #     ]["offset_sec"]
+        #     item["targets"]["v_start_i_sec"] = self.vid2offset_params[
+        #         str(Path(path).stem)
+        #     ]["v_start_i_sec"]
 
         return item
 

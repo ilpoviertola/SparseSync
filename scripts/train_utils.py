@@ -108,7 +108,7 @@ def get_datasets(cfg, transforms):
     return {
         "train": DatasetClass(
             "train",
-            vids_path,
+            Path(vids_path),
             transforms["train"],
             load_fixed_offsets_on_test=load_fixed_offsets_on_test,
             vis_load_backend=vis_load_backend,
@@ -116,7 +116,7 @@ def get_datasets(cfg, transforms):
         ),
         "valid": DatasetClass(
             "valid",
-            vids_path,
+            Path(vids_path),
             transforms["test"],
             load_fixed_offsets_on_test=load_fixed_offsets_on_test,
             vis_load_backend=vis_load_backend,
@@ -124,7 +124,7 @@ def get_datasets(cfg, transforms):
         ),
         "test": DatasetClass(
             "test",
-            vids_path,
+            Path(vids_path),
             transforms["test"],
             load_fixed_offsets_on_test=load_fixed_offsets_on_test,
             vis_load_backend=vis_load_backend,
