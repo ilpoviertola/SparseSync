@@ -9,12 +9,12 @@ training:
   num_workers: 10
   weight_decay: 0
   num_epochs: 100
-  num_classes: 308
+  num_classes: 2
   patience: 10
   cls_weights_in_loss: False
   resume: False
   finetune: False
-  seed: 1337
+  seed: 666
   learning_rate: 3e-4
   dist_backend: 'nccl'
   optimizer:
@@ -30,8 +30,8 @@ training:
 data:
   vids_dir: 'PLACEHOLDER'
   to_filter_bad_examples: True
-  max_duration_sec: 10
-  crop_len_sec: 5 # 8 5 7
+  max_duration_sec: 5
+  crop_len_sec: 2 # 8 5 7
   n_fft: 512
   hop_length: 128  # n_fft // 4
   p_audio_aug: 0.2
