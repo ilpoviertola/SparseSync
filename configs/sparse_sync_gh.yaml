@@ -149,7 +149,7 @@ data:
 transform_sequence_train:
   - target: dataset.transforms.EqualifyFromRight
     params:
-      clip_max_len_sec: 2 # for LRS3 this can be increased to allow more training data as clips may be >10s
+      clip_max_len_sec: 5 # for LRS3 this can be increased to allow more training data as clips may be >10s
   - target: dataset.transforms.RGBSpatialCropSometimesUpscale
     params:
       sometimes_p: ${data.sometimes_upscale_p}

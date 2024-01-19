@@ -26,7 +26,7 @@ class GreatestHitDataset(Dataset):
         transforms: tp.Optional[tp.Callable] = None,
         meta_path: Path = Path("./data/greatesthit.csv"),
         split_dir_path: Path = Path("./data/"),
-        video_length: float = 2.0,
+        video_length: float = 5.0,
         sample_rate_audio: int = 24000,
         sample_rate_video: float = 25.0,
         run_additional_checks: bool = True,
@@ -82,10 +82,10 @@ class GreatestHitDataset(Dataset):
         self.a_sr = sample_rate_audio
         self.v_sr = sample_rate_video
 
-        if load_fixed_offsets_on_test and split in ["valid", "test"]:
-            self.vid2offset_params = get_fixed_offsets(
-                transforms, split, split_dir_path, "vggsound"
-            )
+        # if load_fixed_offsets_on_test and split in ["valid", "test"]:
+        #     self.vid2offset_params = get_fixed_offsets(
+        #         transforms, split, split_dir_path, "vggsound"
+        #     )
 
         if run_additional_checks:
             pass  # for now
@@ -93,6 +93,20 @@ class GreatestHitDataset(Dataset):
     def __getitem__(self, index) -> dict:
         path = self.data_path / Path(self.dataset[index])
         rgb, audio, meta = self.load_media(path.as_posix())
+        audio = F.pad(
+            audio,
+            (0, self.audio_len_in_samples - audio.shape[-1]),
+            mode="constant",
+            value=0,
+        )
+        rgb = rgb[: self.video_len_in_samples, :, :, :]
+        # Calculate the number of frames to pad
+        num_padding_frames = self.video_len_in_samples - rgb.shape[0]
+        # If the number of frames to pad is greater than 0, pad the video tensor
+        if num_padding_frames > 0:
+            # Create a padding tensor of zeros with the same dimensions as the video tensor, except for the length
+            padding = (0, 0, 0, 0, 0, 0, 0, num_padding_frames)
+            rgb = F.pad(rgb, padding, mode="constant", value=0)
         item = self.make_datapoint(path, rgb, audio, meta)
         if self.transforms is not None:
             item = self.transforms(item)
@@ -165,27 +179,29 @@ class GreatestHitAudioOnlyDataset(GreatestHitDataset):
     def __init__(
         self,
         split: str,
-        split_dir_path: Path,
         data_path: Path,
-        meta_path: Path,
-        video_length: float = 2,
-        sample_rate_audio: int = 24000,
-        sample_rate_video: float = 25,
         transforms: tp.Optional[tp.Callable] = None,
+        meta_path: Path = Path("./data/greatesthit.csv"),
+        split_dir_path: Path = Path("./data/"),
+        video_length: float = 2.0,
+        sample_rate_audio: int = 24000,
+        sample_rate_video: float = 25.0,
         run_additional_checks: bool = True,
         load_fixed_offsets_on_test=True,
+        **kwargs,
     ) -> None:
         super().__init__(
             split,
-            split_dir_path,
             data_path,
+            transforms,
             meta_path,
+            split_dir_path,
             video_length,
             sample_rate_audio,
             sample_rate_video,
-            transforms,
             run_additional_checks,
             load_fixed_offsets_on_test,
+            **kwargs,
         )
 
     def __getitem__(self, index):
