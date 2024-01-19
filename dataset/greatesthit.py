@@ -82,10 +82,10 @@ class GreatestHitDataset(Dataset):
         self.a_sr = sample_rate_audio
         self.v_sr = sample_rate_video
 
-        # if load_fixed_offsets_on_test and split in ["valid", "test"]:
-        #     self.vid2offset_params = get_fixed_offsets(
-        #         transforms, split, split_dir_path, "vggsound"
-        #     )
+        if load_fixed_offsets_on_test and split in ["valid", "test"]:
+            self.vid2offset_params = get_fixed_offsets(
+                transforms, split, split_dir_path, "greatesthit"
+            )
 
         if run_additional_checks:
             pass  # for now
@@ -136,13 +136,13 @@ class GreatestHitDataset(Dataset):
         }
 
         # loading the fixed offsets. COMMENT THIS IF YOU DON'T HAVE A FILE YET
-        # if self.load_fixed_offsets_on_test and self.split in ["valid", "test"]:
-        #     item["targets"]["offset_sec"] = self.vid2offset_params[
-        #         str(Path(path).stem)
-        #     ]["offset_sec"]
-        #     item["targets"]["v_start_i_sec"] = self.vid2offset_params[
-        #         str(Path(path).stem)
-        #     ]["v_start_i_sec"]
+        if self.load_fixed_offsets_on_test and self.split in ["valid", "test"]:
+            item["targets"]["offset_sec"] = self.vid2offset_params[
+                str(Path(path).stem)
+            ]["offset_sec"]
+            item["targets"]["v_start_i_sec"] = self.vid2offset_params[
+                str(Path(path).stem)
+            ]["v_start_i_sec"]
 
         return item
 

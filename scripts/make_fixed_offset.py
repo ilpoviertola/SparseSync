@@ -91,7 +91,7 @@ def main(cfg: DictConfig):
                     .replace(".mp4", "")
                 )
 
-        elif "/greatesthit/" in vids_path:
+        elif "/greatesthits/" in vids_path:
             suffix = "_greatesthit"
 
             def _get_unique_id(path):
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     # cfg.data.dataset.target = 'dataset.vggsound.VGGSound'
     # cfg.data.vids_path = '/scratch/project_2000936/vladimir/vggsound/h264_video_25fps_256side_16000hz_aac'
     # cfg.data.vids_path = '/home/nvme/data/lrs3/video_10fps_256side_22050hz'
-    cfg.data.vids_path = cfg_cli.vids_path
+    # cfg.data.vids_path = cfg_cli.vids_path
     cfg.data.dataset.target = cfg_cli.dataset
     cfg.data.crop_len_sec = cfg_cli.crop_len_sec
     cfg.data.max_off_sec = cfg_cli.max_off_sec

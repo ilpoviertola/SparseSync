@@ -11,9 +11,7 @@ NUM_WORKERS = 32
 V_FPS = 25
 MIN_SIDE = 256
 A_FPS = 16000
-ORIG_PATH = Path(
-    "/home/hdd/data/greatesthits/h264_video_25fps_256side_24000hz_aac_preprocessed"
-)
+ORIG_PATH = Path("/home/hdd/data/greatesthits/vis-data-256")
 VCODEC = "h264"
 CRF = 10
 PIX_FMT = "yuv420p"
