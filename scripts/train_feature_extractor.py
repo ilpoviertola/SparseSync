@@ -34,7 +34,7 @@ def train(cfg):
     set_seed(cfg.training.seed + global_rank)
 
     # meta_path = './data/vggsound.csv'
-    meta_path = ".data/greatesthit.csv"
+    meta_path = "./data/greatesthit.csv"
     splits_path = "./data/"
 
     transform_sequence_train_cfg = cfg.get("transform_sequence_train", None)

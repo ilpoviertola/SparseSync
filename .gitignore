@@ -130,3 +130,8 @@ dmypy.json
 
 # VSCode project settings
 .vscode/
+
+# folders
+conda_env/
+logs/
+sbatch_logs/

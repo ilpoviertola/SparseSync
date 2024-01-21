@@ -3,7 +3,7 @@ action: 'train_audio_feature_extractor'
 model: 'resnet18'
 
 training:
-  batch_size: 16
+  batch_size: 32
   run_test_only: False
   device: 'cuda:0'
   num_workers: 10
@@ -28,7 +28,7 @@ training:
     warmup: 1000 # iterations to recover from base_learning_rate / 100
 
 data:
-  vids_dir: 'PLACEHOLDER'
+  vids_path: '/scratch/project_2004994/viertoli/datasets/greatesthit/h264_video_25fps_256side_16000hz_aac_preprocessed'
   to_filter_bad_examples: True
   max_duration_sec: 5
   crop_len_sec: 2 # 8 5 7
@@ -105,5 +105,5 @@ logging:
   logdir: './logs/feature_extractors'
   # patterns to ignore when backing up the code folder
   patterns_to_ignore: ['logs', '.git', '__pycache__', 'data', 'checkpoints', '*.pt', 'sbatch_logs', '*.mp4', '*.wav', '*.jpg']
-  use_wandb: True
+  use_wandb: False
   log_code_state: True

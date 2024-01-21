@@ -127,7 +127,7 @@ class GreatestHitDataset(Dataset):
             "video": rgb,
             "audio": audio,
             "meta": meta,
-            "path": str(path),
+            "path": path.as_posix(),
             "targets": {
                 "label": self.filename2label[path.name],
                 "target": self.filename2target[path.name],
@@ -149,7 +149,7 @@ class GreatestHitDataset(Dataset):
     @staticmethod
     def _get_all_files_with_same_basename(basename: str, data_dir: Path) -> list:
         all_files = data_dir.glob(f"{basename}*")
-        return [f.name for f in list(all_files)]  # return only filenames
+        return [f.name for f in list(all_files) if f.suffix == ".mp4"]  # return only filenames
 
     @staticmethod
     def _get_filename2all(meta_path: Path) -> tp.Tuple[dict, dict, dict]:
@@ -205,15 +205,15 @@ class GreatestHitAudioOnlyDataset(GreatestHitDataset):
         )
 
     def __getitem__(self, index):
-        path = self.dataset[index]
+        path = self.data_path / Path(self.dataset[index])
         # (Ta, C) in [-1, 1]
-        audio, meta = get_audio_stream(path, get_meta=True)
+        audio, meta = get_audio_stream(path.as_posix(), get_meta=True)
 
-        target = self.filename2target[Path(path).stem]
+        target = self.filename2target[(path.with_suffix(".mp4")).name]
         item = {
             "audio": audio,
             "meta": meta,
-            "path": path,
+            "path": path.as_posix(),
             "target": target,
             "label": self.target2label[target],
             "split": self.split,

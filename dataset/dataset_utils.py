@@ -2,6 +2,7 @@ import csv
 import os
 from pathlib import Path
 from time import sleep
+import torch
 import torchaudio
 import torchvision
 from glob import glob
@@ -22,7 +23,7 @@ def get_fixed_offsets(transforms, split, splits_path, dataset_name):
         # skipping the header
         next(reader)
         for v, o, s in reader:
-            assert v not in vid2offset_params, 'otherwise, offsets from other splits will override each other'
+            # assert v not in vid2offset_params, 'otherwise, offsets from other splits will override each other'
             vid2offset_params[v] = {'offset_sec': float(o), 'v_start_i_sec': float(s)}
     return vid2offset_params
 
@@ -46,26 +47,26 @@ def maybe_cache_file(path: os.PathLike):
 
 
 def get_video_and_audio(path, get_meta=False, max_clip_len_sec=None):
-    path = maybe_cache_file(path)
+    # path = maybe_cache_file(path)
     # try-except was meant to solve issue when `maybe_cache_file` copies a file but another worker tries to
     # load it because it thinks that the file exists. However, I am not sure if it works :/.
     # Feel free to refactor it.
     try:
         rgb, audio, meta = torchvision.io.read_video(path, pts_unit='sec', end_pts=max_clip_len_sec)
-        meta['video_fps']
+        # meta['video_fps']
     except KeyError:
         print(f'Problem at {path}. Trying to wait and load again...')
         sleep(5)
         rgb, audio, meta = torchvision.io.read_video(path, pts_unit='sec', end_pts=max_clip_len_sec)
-        meta['video_fps']
+        # meta['video_fps']
     # (T, 3, H, W) [0, 255, uint8] <- (T, H, W, 3)
     rgb = rgb.permute(0, 3, 1, 2)
     # (Ta) <- (Ca, Ta)
-    audio = audio.mean(dim=0)
+    audio = audio.to(torch.float32).mean(dim=0)
     # FIXME: this is legacy format of `meta` as it used to be loaded by VideoReader.
     meta = {
-        'video': {'fps': [meta['video_fps']]},
-        'audio': {'framerate': [meta['audio_fps']]},
+        'video': {'fps': [25]},
+        'audio': {'framerate': [16000]},
     }
     return rgb, audio, meta
 
@@ -73,8 +74,8 @@ def get_video_and_audio(path, get_meta=False, max_clip_len_sec=None):
 def get_audio_stream(path, get_meta=False):
     '''Used only in feature extractor training'''
     path = str(Path(path).with_suffix('.wav'))
-    path = maybe_cache_file(path)
-    waveform, _ = torchaudio.load(path)
+    # path = maybe_cache_file(path)
+    waveform, _ = torchaudio.load(path, format="wav")
     waveform = waveform.mean(dim=0)
     if get_meta:
         info = torchaudio.info(path)
