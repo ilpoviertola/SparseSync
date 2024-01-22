@@ -30,7 +30,7 @@ model:
     transformer:
       target: model.modules.feature_selector.SparseSync
       params:
-        num_offset_cls: 2  # e.g. 21 for (-2.0, -1.8, ..., 0.0, ..., 1.8, 2.0)
+        num_offset_cls: 21  # e.g. 21 for (-2.0, -1.8, ..., 0.0, ..., 1.8, 2.0)
         visual_block_shape: [6, 7, 7] # see the output of the feature_extractors [50, 7, 7] - rn; [16, 7, 7] - s3d; [50, 14, 14] - vit
         audio_block_shape: [9, 20] # see the output of the feature_extractors
         pre_norm_cfg:
@@ -165,7 +165,7 @@ transform_sequence_train:
       max_wiggle_sec: ${data.audio_jitter_sec}
       do_offset: ${data.do_offset}
       grid_type: 'linspace' # uniform linspace
-      grid_size: 21 # ${model.params.transformer.params.num_offset_cls}
+      grid_size: ${model.params.transformer.params.num_offset_cls}
   - target: dataset.transforms.RandomApplyColorDistortion
     params:
       p_color_jitter: ${data.p_color_jitter}
@@ -240,7 +240,7 @@ transform_sequence_test:
       max_off_sec: ${data.max_off_sec}
       do_offset: ${data.do_offset}
       grid_type: 'linspace' # uniform linspace
-      grid_size: 21 # ${model.params.transformer.params.num_offset_cls}
+      grid_size: ${model.params.transformer.params.num_offset_cls}
   - target: dataset.transforms.FreezeFrames
     params:
       max_off_sec: ${data.max_off_sec}
