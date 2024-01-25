@@ -134,12 +134,12 @@ if __name__ == "__main__":
     # cfg.data.vids_path = '/scratch/project_2000936/vladimir/vggsound/h264_video_25fps_256side_16000hz_aac'
     # cfg.data.vids_path = '/home/nvme/data/lrs3/video_10fps_256side_22050hz'
     # cfg.data.vids_path = cfg_cli.vids_path
-    cfg.data.dataset.target = cfg_cli.dataset
-    cfg.data.crop_len_sec = cfg_cli.crop_len_sec
-    cfg.data.max_off_sec = cfg_cli.max_off_sec
+    # cfg.data.dataset.target = cfg_cli.dataset
+    # cfg.data.crop_len_sec = cfg_cli.crop_len_sec
+    # cfg.data.max_off_sec = cfg_cli.max_off_sec
     # for cls_num in [3, 9, 41]:  # [-2, 0, +2]
     # for cls_num in [3, 5, 21]:   # [-1, 0, +1]
-    cfg.model.params.transformer.params.num_offset_cls = cfg_cli.off_cls_num
+    # cfg.model.params.transformer.params.num_offset_cls = cfg_cli.off_cls_num
     cfg.data.audio_jitter_sec = 0.0  # turn off augmentations
 
     cfg_sanity_check_and_patch(cfg)

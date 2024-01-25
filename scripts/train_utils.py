@@ -105,6 +105,7 @@ def get_datasets(cfg, transforms):
     vis_load_backend = cfg.data.dataset.params.vis_load_backend
     size_ratio = cfg.data.dataset.params.size_ratio
     vids_path = cfg.data.vids_path
+    meta_path = Path(cfg.data.dataset.params.get("meta_path", "./data/greatesthit.csv"))
     return {
         "train": DatasetClass(
             "train",
@@ -113,6 +114,7 @@ def get_datasets(cfg, transforms):
             load_fixed_offsets_on_test=load_fixed_offsets_on_test,
             vis_load_backend=vis_load_backend,
             size_ratio=size_ratio,
+            meta_path=meta_path,
         ),
         "valid": DatasetClass(
             "valid",
@@ -121,6 +123,7 @@ def get_datasets(cfg, transforms):
             load_fixed_offsets_on_test=load_fixed_offsets_on_test,
             vis_load_backend=vis_load_backend,
             size_ratio=size_ratio,
+            meta_path=meta_path,
         ),
         "test": DatasetClass(
             "test",
@@ -128,6 +131,7 @@ def get_datasets(cfg, transforms):
             transforms["test"],
             load_fixed_offsets_on_test=load_fixed_offsets_on_test,
             vis_load_backend=vis_load_backend,
+            meta_path=meta_path,
         ),
     }
 
