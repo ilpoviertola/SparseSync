@@ -224,7 +224,11 @@ def quantize_offset(grid: torch.Tensor, off_sec: float) -> Tuple[float, int]:
     '''Takes in the offset in seconds and snaps it onto the closest grid element.
     Returns the grid value and its index.'''
     closest_grid_el = (grid - off_sec).abs().argmin()
-    return grid[closest_grid_el], closest_grid_el
+    if abs(grid[closest_grid_el]) <= 0.3:
+        target = 1  # in-sync
+    else:
+        target = 0  # out-of-sync
+    return grid[closest_grid_el], target
 
 
 class TemporalCropAndOffset(torch.nn.Module):

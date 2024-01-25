@@ -148,8 +148,10 @@ class GreatestHitDataset(Dataset):
 
     @staticmethod
     def _get_all_files_with_same_basename(basename: str, data_dir: Path) -> list:
-        all_files = data_dir.glob(f"{basename}*")
-        return [f.name for f in list(all_files) if f.suffix == ".mp4"]  # return only filenames
+        all_files = data_dir.glob(f"{basename}_denoised*")
+        return [
+            f.name for f in list(all_files) if f.suffix == ".mp4"
+        ]  # return only filenames
 
     @staticmethod
     def _get_filename2all(meta_path: Path) -> tp.Tuple[dict, dict, dict]:
