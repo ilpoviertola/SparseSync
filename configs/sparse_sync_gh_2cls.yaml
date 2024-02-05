@@ -124,7 +124,7 @@ training:
 data:
   crop_len_sec: 2
   max_off_sec: 2
-  vids_path: /home/hdd/data/greatesthits/vis-data-256_h264_video_25fps_256side_24000hz_aac_splitby_random # something that ends with 'CODEC_video_XXfps_YYYside_ZZZZZhz' or '..._25fps_...'
+  vids_path: /home/hdd/data/greatesthits/vis-data-256_h264_video_25fps_256side_24000hz_aac_len_5_splitby_random # something that ends with 'CODEC_video_XXfps_YYYside_ZZZZZhz' or '..._25fps_...'
   size_before_crop: 256  # video resolution -> size_before_crop resolution -> input_size (crop resolution)
   input_size: 224
   do_offset: True
@@ -147,7 +147,7 @@ data:
       load_fixed_offsets_on_test: True
       vis_load_backend: 'read_video'
       size_ratio: null  # null or 1.0: full dataset; a ratio will use a proportion of it
-      meta_path: /home/hdd/data/greatesthits/vis-data-256_h264_video_25fps_256side_24000hz_aac_splitby_random/metadata.csv
+      meta_path: /home/hdd/data/greatesthits/vis-data-256_h264_video_25fps_256side_24000hz_aac_len_5_splitby_random/metadata.csv
 
 # sequentially defined
 transform_sequence_train:
