@@ -99,42 +99,60 @@ def get_transforms(cfg):
     return transforms
 
 
+# def get_datasets(cfg, transforms):
+#     DatasetClass = get_obj_from_str(cfg.data.dataset.target)
+#     load_fixed_offsets_on_test = cfg.data.dataset.params.load_fixed_offsets_on_test
+#     vis_load_backend = cfg.data.dataset.params.vis_load_backend
+#     size_ratio = cfg.data.dataset.params.size_ratio
+#     vids_path = cfg.data.vids_path
+#     meta_path = Path(cfg.data.dataset.params.get("meta_path", "./data/greatesthit.csv"))
+#     return {
+#         "train": DatasetClass(
+#             "train",
+#             Path(vids_path),
+#             transforms["train"],
+#             load_fixed_offsets_on_test=load_fixed_offsets_on_test,
+#             vis_load_backend=vis_load_backend,
+#             size_ratio=size_ratio,
+#             meta_path=meta_path,
+#         ),
+#         "valid": DatasetClass(
+#             "valid",
+#             Path(vids_path),
+#             transforms["test"],
+#             load_fixed_offsets_on_test=load_fixed_offsets_on_test,
+#             vis_load_backend=vis_load_backend,
+#             size_ratio=size_ratio,
+#             meta_path=meta_path,
+#         ),
+#         "test": DatasetClass(
+#             "test",
+#             Path(vids_path),
+#             transforms["test"],
+#             load_fixed_offsets_on_test=load_fixed_offsets_on_test,
+#             vis_load_backend=vis_load_backend,
+#             meta_path=meta_path,
+#         ),
+#     }
+
+
 def get_datasets(cfg, transforms):
     DatasetClass = get_obj_from_str(cfg.data.dataset.target)
     load_fixed_offsets_on_test = cfg.data.dataset.params.load_fixed_offsets_on_test
     vis_load_backend = cfg.data.dataset.params.vis_load_backend
     size_ratio = cfg.data.dataset.params.size_ratio
     vids_path = cfg.data.vids_path
-    meta_path = Path(cfg.data.dataset.params.get("meta_path", "./data/greatesthit.csv"))
     return {
-        "train": DatasetClass(
-            "train",
-            Path(vids_path),
-            transforms["train"],
-            load_fixed_offsets_on_test=load_fixed_offsets_on_test,
-            vis_load_backend=vis_load_backend,
-            size_ratio=size_ratio,
-            meta_path=meta_path,
-        ),
-        "valid": DatasetClass(
-            "valid",
-            Path(vids_path),
-            transforms["test"],
-            load_fixed_offsets_on_test=load_fixed_offsets_on_test,
-            vis_load_backend=vis_load_backend,
-            size_ratio=size_ratio,
-            meta_path=meta_path,
-        ),
-        "test": DatasetClass(
-            "test",
-            Path(vids_path),
-            transforms["test"],
-            load_fixed_offsets_on_test=load_fixed_offsets_on_test,
-            vis_load_backend=vis_load_backend,
-            meta_path=meta_path,
-        ),
+        'train': DatasetClass('train', vids_path, transforms['train'],
+                              load_fixed_offsets_on_test=load_fixed_offsets_on_test,
+                              vis_load_backend=vis_load_backend, size_ratio=size_ratio),
+        'valid': DatasetClass('valid', vids_path, transforms['test'],
+                              load_fixed_offsets_on_test=load_fixed_offsets_on_test,
+                              vis_load_backend=vis_load_backend, size_ratio=size_ratio),
+        'test': DatasetClass('test', vids_path, transforms['test'],
+                             load_fixed_offsets_on_test=load_fixed_offsets_on_test,
+                             vis_load_backend=vis_load_backend),
     }
-
 
 def get_batch_sizes(cfg, num_gpus):
     train_B = cfg.training.base_batch_size

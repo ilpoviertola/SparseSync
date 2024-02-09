@@ -5,12 +5,10 @@ model:
   params:
     afeat_extractor:
       is_trainable: True
-      target: model.modules.feature_extractors.ResNetAudio
+      target: model.modules.feature_extractors.ResNet18AudioFeatures
       params:
-        ckpt_path: /scratch/project_2004994/viertoli/logs/sync/feature_extractors/24-02-07T10-15-40/24-02-07T10-15-40.pt
-        arch_name: 'resnet18'
-        num_classes: 2
-        extract_features: true
+        # ckpt_path: null
+        ckpt_path: ./logs/feature_extractors/22-06-24T08-10-33/ResNetAudio-22-06-24T08-10-33.pt  # 5s 16000hz
     vfeat_extractor:
       is_trainable: True
       target: model.modules.feature_extractors.S3DVisualFeatures
@@ -31,8 +29,8 @@ model:
       target: model.modules.feature_selector.SparseSync
       params:
         num_offset_cls: 2  # e.g. 21 for (-2.0, -1.8, ..., 0.0, ..., 1.8, 2.0)
-        visual_block_shape: [6, 7, 7] # see the output of the feature_extractors [50, 7, 7] - rn; [16, 7, 7] - s3d; [50, 14, 14] - vit
-        audio_block_shape: [9, 12] # see the output of the feature_extractors
+        visual_block_shape: [16, 7, 7] # see the output of the feature_extractors [50, 7, 7] - rn; [16, 7, 7] - s3d; [50, 14, 14] - vit
+        audio_block_shape: [9, 20] # see the output of the feature_extractors
         pre_norm_cfg:
           target: torch.nn.LayerNorm  # LayerNorm or Identity (no normalization) model.modules.transformer.L2Normalize
           params:
@@ -122,9 +120,9 @@ training:
     weight_decay: 0
 
 data:
-  crop_len_sec: 2
+  crop_len_sec: 5
   max_off_sec: 2
-  vids_path: /home/hdd/data/greatesthits/vis-data-256_h264_video_25fps_256side_24000hz_aac_len_5_splitby_random # something that ends with 'CODEC_video_XXfps_YYYside_ZZZZZhz' or '..._25fps_...'
+  vids_path: /scratch/project_2000936/vladimir/data/lrs3/h264_uncropped_25fps_256side_16000hz_aac/ # something that ends with 'CODEC_video_XXfps_YYYside_ZZZZZhz' or '..._25fps_...'
   size_before_crop: 256  # video resolution -> size_before_crop resolution -> input_size (crop resolution)
   input_size: 224
   do_offset: True
@@ -142,18 +140,17 @@ data:
   active_min_overlap_sec: 1
   # changing `dataset` arguments here won't affect the init call. See train_utils.get_datasets
   dataset:
-    target: dataset.greatesthit.GreatestHitDataset
+    target: dataset.lrs.LRS3
     params:
       load_fixed_offsets_on_test: True
       vis_load_backend: 'read_video'
-      size_ratio: null  # null or 1.0: full dataset; a ratio will use a proportion of it
-      meta_path: /home/hdd/data/greatesthits/vis-data-256_h264_video_25fps_256side_24000hz_aac_len_5_splitby_random/metadata.csv
+      size_ratio: null  # null or 1.0: full dataset
 
 # sequentially defined
 transform_sequence_train:
   - target: dataset.transforms.EqualifyFromRight
     params:
-      clip_max_len_sec: 5 # for LRS3 this can be increased to allow more training data as clips may be >10s
+      clip_max_len_sec: 10 # for LRS3 this can be increased to allow more training data as clips may be >10s
   - target: dataset.transforms.RGBSpatialCropSometimesUpscale
     params:
       sometimes_p: ${data.sometimes_upscale_p}

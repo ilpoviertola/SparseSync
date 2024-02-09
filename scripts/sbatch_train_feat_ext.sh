@@ -1,22 +1,25 @@
 #!/bin/bash
 
 #SBATCH --job-name=tfe
-#SBATCH --account=project_2000936
+#SBATCH --account=project_2004994
 #SBATCH --output=./sbatch_logs/%J.log
 #SBATCH --error=./sbatch_logs/%J.log
 #SBATCH --verbose
+#SBATCH --partition=gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:v100:1,nvme:500
 #SBATCH --cpus-per-task=10
 #SBATCH --mem-per-gpu=30G
+#SBATCH --time=12:00:00
 
 # exit when any command fails
 set -e
 
 # loading conda environment
-source $PROJAPPL/miniconda3/etc/profile.d/conda.sh
-conda activate sparse_sync
+# source $PROJAPPL/miniconda3/etc/profile.d/conda.sh
+# conda activate sparse_sync
+export PATH="/projappl/project_2004994/SparseSync/conda_env/bin:$PATH"
 
 ## The following will assign a master port (picked randomly to avoid collision) and an address for ddp.
 ## However, you will need just one GPU
@@ -31,9 +34,8 @@ export MASTER_PORT=$MASTER_PORT
 export MASTER_ADDR=$MASTER_ADDR
 
 # path to the folder with `.wav` files
-VIDS_PATH="/scratch/project_2000936/vladimir/vggsound/h264_video_25fps_256side_16000hz_aac/"
+# VIDS_PATH="/scratch/project_2000936/vladimir/vggsound/h264_video_25fps_256side_16000hz_aac/"
 
 srun python main.py \
     config="./configs/audio_feature_extractor.yaml" \
-    data.vids_dir="$VIDS_PATH" \
-    data.crop_len_sec="5"
+    data.crop_len_sec="2"

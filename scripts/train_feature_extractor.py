@@ -34,7 +34,8 @@ def train(cfg):
     set_seed(cfg.training.seed + global_rank)
 
     # meta_path = './data/vggsound.csv'
-    meta_path = "./data/greatesthit.csv"
+    # meta_path = "./data/greatesthit.csv"
+    meta_path = "/scratch/project_2004994/greatesthit/h264_video_25fps_256side_24000hz_aac_preprocessed/metadata.csv"
     splits_path = "./data/"
 
     transform_sequence_train_cfg = cfg.get("transform_sequence_train", None)

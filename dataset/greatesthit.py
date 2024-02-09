@@ -31,6 +31,7 @@ class GreatestHitDataset(Dataset):
         sample_rate_video: float = 25.0,
         run_additional_checks: bool = True,
         load_fixed_offsets_on_test=True,
+        dataset_file_suffix=".mp4",
         **kwargs,
     ) -> None:
         super().__init__()
@@ -56,7 +57,7 @@ class GreatestHitDataset(Dataset):
             within_split = f.read().splitlines()
 
         for basename in within_split:
-            files = self._get_all_files_with_same_basename(basename, data_path)
+            files = self._get_all_files_with_same_basename(basename, data_path, dataset_file_suffix)
             self.dataset += files
 
         (
@@ -93,20 +94,20 @@ class GreatestHitDataset(Dataset):
     def __getitem__(self, index) -> dict:
         path = self.data_path / Path(self.dataset[index])
         rgb, audio, meta = self.load_media(path.as_posix())
-        audio = F.pad(
-            audio,
-            (0, self.audio_len_in_samples - audio.shape[-1]),
-            mode="constant",
-            value=0,
-        )
-        rgb = rgb[: self.video_len_in_samples, :, :, :]
-        # Calculate the number of frames to pad
-        num_padding_frames = self.video_len_in_samples - rgb.shape[0]
-        # If the number of frames to pad is greater than 0, pad the video tensor
-        if num_padding_frames > 0:
-            # Create a padding tensor of zeros with the same dimensions as the video tensor, except for the length
-            padding = (0, 0, 0, 0, 0, 0, 0, num_padding_frames)
-            rgb = F.pad(rgb, padding, mode="constant", value=0)
+        # audio = F.pad(
+        #     audio,
+        #     (0, self.audio_len_in_samples - audio.shape[-1]),
+        #     mode="constant",
+        #     value=0,
+        # )
+        # rgb = rgb[: self.video_len_in_samples, :, :, :]
+        # # Calculate the number of frames to pad
+        # num_padding_frames = self.video_len_in_samples - rgb.shape[0]
+        # # If the number of frames to pad is greater than 0, pad the video tensor
+        # if num_padding_frames > 0:
+        #     # Create a padding tensor of zeros with the same dimensions as the video tensor, except for the length
+        #     padding = (0, 0, 0, 0, 0, 0, 0, num_padding_frames)
+        #     rgb = F.pad(rgb, padding, mode="constant", value=0)
         item = self.make_datapoint(path, rgb, audio, meta)
         if self.transforms is not None:
             item = self.transforms(item)
@@ -147,10 +148,10 @@ class GreatestHitDataset(Dataset):
         return item
 
     @staticmethod
-    def _get_all_files_with_same_basename(basename: str, data_dir: Path) -> list:
+    def _get_all_files_with_same_basename(basename: str, data_dir: Path, suffix: str = ".mp4") -> list:
         all_files = data_dir.glob(f"{basename}_denoised*")
         return [
-            f.name for f in list(all_files) if f.suffix == ".mp4"
+            f.name for f in list(all_files) if f.suffix == suffix
         ]  # return only filenames
 
     @staticmethod
@@ -190,6 +191,7 @@ class GreatestHitAudioOnlyDataset(GreatestHitDataset):
         sample_rate_video: float = 25.0,
         run_additional_checks: bool = True,
         load_fixed_offsets_on_test=True,
+        dataset_file_suffix=".wav",
         **kwargs,
     ) -> None:
         super().__init__(
@@ -203,6 +205,7 @@ class GreatestHitAudioOnlyDataset(GreatestHitDataset):
             sample_rate_video,
             run_additional_checks,
             load_fixed_offsets_on_test,
+            dataset_file_suffix,
             **kwargs,
         )
 

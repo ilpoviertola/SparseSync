@@ -28,7 +28,7 @@ training:
     warmup: 1000 # iterations to recover from base_learning_rate / 100
 
 data:
-  vids_path: '/scratch/project_2004994/viertoli/datasets/greatesthit/h264_video_25fps_256side_16000hz_aac_preprocessed'
+  vids_path: /scratch/project_2004994/greatesthit/h264_video_25fps_256side_24000hz_aac_preprocessed_wav
   to_filter_bad_examples: True
   max_duration_sec: 5
   crop_len_sec: 2 # 8 5 7
@@ -102,7 +102,7 @@ transform_sequence_test:
       dim: 0
 
 logging:
-  logdir: './logs/feature_extractors'
+  logdir: /scratch/project_2004994/viertoli/logs/sync/feature_extractors
   # patterns to ignore when backing up the code folder
   patterns_to_ignore: ['logs', '.git', '__pycache__', 'data', 'checkpoints', '*.pt', 'sbatch_logs', '*.mp4', '*.wav', '*.jpg']
   use_wandb: False

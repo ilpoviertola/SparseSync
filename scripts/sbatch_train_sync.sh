@@ -1,15 +1,17 @@
 #!/bin/bash
 
 #SBATCH --job-name=ts
-#SBATCH --account=project_2000936
+#SBATCH --account=project_2004994
 #SBATCH --output=./sbatch_logs/%J.log
 #SBATCH --error=./sbatch_logs/%J.log
 #SBATCH --verbose
-#SBATCH --nodes=8
+#SBATCH --partition=gpu
+#SBATCH --nodes=4
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:v100:1,nvme:500
 #SBATCH --cpus-per-task=10
 #SBATCH --mem-per-gpu=85G
+#SBATCH --time=36:00:00
 
 # argparse. it is used by a submitting script (`./scripts/submit_job.sh`) and can be ignored
 for i in "$@"; do
@@ -43,13 +45,16 @@ export MASTER_ADDR=$MASTER_ADDR
 echo "MASTER_ADDR" $MASTER_ADDR "MASTER_PORT" $MASTER_PORT "WORKERS" $WORKERS
 
 # load conda environment
-source $PROJAPPL/miniconda3/etc/profile.d/conda.sh
-conda activate sparse_sync
+# source $PROJAPPL/miniconda3/etc/profile.d/conda.sh
+# conda activate sparse_sync
+export PATH="/projappl/project_2004994/SparseSync/conda_env/bin:$PATH"
 
 ## select the dataset
 # DATASET="LRS3_face_crop"
 DATASET="LRS3_no_face_crop"
 # DATASET="VGGSoundSparsePicked"
+
+SCRATCH="/scratch/project_2000936"
 
 if [[ "$DATASET" == "VGGSound" ]] || [[ "$DATASET" == "VGGSoundSparsePicked" ]]; then
     DATASET_TARGET="dataset.vggsound.$DATASET"
@@ -64,8 +69,16 @@ fi
 
 
 srun python main.py start_time="$NOW" \
-    config="./configs/sparse_sync.yaml" \
-    logging.logdir="$SCRATCH/vladimir/logs/sync/sync_models/" \
+    config="configs/sparse_sync_lrs3_2cls_5sec.yaml" \
+    logging.logdir="/scratch/project_2004994/viertoli/logs/sync/sync_model" \
     data.vids_path="$VIDS_PATH" \
     data.dataset.target="$DATASET_TARGET" \
     training.base_batch_size="10"
+
+# srun python main.py \
+#     config="./configs/sparse_sync_gh_2cls.yaml" \
+#     logging.logdir="/scratch/project_2004994/viertoli/logs/sync/sync_model" \
+#     data.vids_path="/scratch/project_2004994/greatesthit/vis-data-256_h264_video_25fps_256side_24000hz_aac_len_5_splitby_random" \
+#     data.dataset.params.meta_path="/scratch/project_2004994/greatesthit/vis-data-256_h264_video_25fps_256side_24000hz_aac_len_5_splitby_random/metadata.csv" \
+#     data.dataset.target="dataset.greatesthit.GreatestHitDataset" \
+#     training.base_batch_size="10"
