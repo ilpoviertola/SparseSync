@@ -247,7 +247,7 @@ def make_class_grid(leftmost_val, rightmost_val, grid_size, grid_type="linspace"
         return torch.from_numpy(grid).float()
 
 
-def quantize_offset(grid: torch.Tensor, off_sec: float) -> Tuple[float, int]:
+def quantize_offset_2cls(grid: torch.Tensor, off_sec: float) -> Tuple[float, int]:
     """Takes in the offset in seconds and snaps it onto the closest grid element.
     Returns the grid value and its index."""
     closest_grid_el = (grid - off_sec).abs().argmin()
@@ -256,6 +256,12 @@ def quantize_offset(grid: torch.Tensor, off_sec: float) -> Tuple[float, int]:
     else:
         target = 0  # out-of-sync
     return grid[closest_grid_el], target
+
+def quantize_offset(grid: torch.Tensor, off_sec: float) -> Tuple[float, int]:
+    '''Takes in the offset in seconds and snaps it onto the closest grid element.
+    Returns the grid value and its index.'''
+    closest_grid_el = (grid - off_sec).abs().argmin()
+    return grid[closest_grid_el], closest_grid_el
 
 
 class TemporalCropAndOffset(torch.nn.Module):
@@ -309,6 +315,7 @@ class TemporalCropAndOffsetRandomFeasible(TemporalCropAndOffset):
         super().__init__(crop_len_sec, max_off_sec, do_offset, grid_size)
         # TODO: rename crop to trim if temporal crop is used
         self.max_a_jitter_sec = max_wiggle_sec
+        self.grid_type = grid_type
         if do_offset:
             self.class_grid = make_class_grid(
                 -max_off_sec, max_off_sec, grid_size, grid_type
@@ -429,7 +436,10 @@ class TemporalCropAndOffsetRandomFeasible(TemporalCropAndOffset):
 
         # caching parameters
         if self.do_offset:
-            offset_label, offset_target = quantize_offset(self.class_grid, offset_sec)
+            if self.grid_type == "uniform_2cls":
+                offset_label, offset_target = quantize_offset_2cls(self.class_grid, offset_sec)
+            else:
+                offset_label, offset_target = quantize_offset(self.class_grid, offset_sec)
             item["targets"]["offset_sec"] = offset_sec
             item["targets"]["v_start_i_sec"] = v_start_i_sec
             item["targets"]["offset_label"] = offset_label

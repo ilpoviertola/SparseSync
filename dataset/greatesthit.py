@@ -58,6 +58,7 @@ class GreatestHitDataset(Dataset):
             within_split = f.read().splitlines()
 
         # take only size_ratio of the split
+        size_ratio = 1.0 if size_ratio is None or split != "train" else size_ratio
         within_split = within_split[: int(size_ratio * len(within_split))]
         for basename in within_split:
             files = self._get_all_files_with_same_basename(
@@ -135,8 +136,8 @@ class GreatestHitDataset(Dataset):
             "meta": meta,
             "path": path.as_posix(),
             "targets": {
-                "label": self.filename2label[path.name],
-                "target": self.filename2target[path.name],
+                # "label": self.filename2label[path.name],
+                # "target": self.filename2target[path.name],
             },
             "split": self.split,
         }
