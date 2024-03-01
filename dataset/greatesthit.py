@@ -32,6 +32,7 @@ class GreatestHitDataset(Dataset):
         run_additional_checks: bool = True,
         load_fixed_offsets_on_test=True,
         dataset_file_suffix=".mp4",
+        size_ratio=1.0,
         **kwargs,
     ) -> None:
         super().__init__()
@@ -56,8 +57,12 @@ class GreatestHitDataset(Dataset):
         with open(split_file_path, encoding="utf-8") as f:
             within_split = f.read().splitlines()
 
+        # take only size_ratio of the split
+        within_split = within_split[: int(size_ratio * len(within_split))]
         for basename in within_split:
-            files = self._get_all_files_with_same_basename(basename, data_path, dataset_file_suffix)
+            files = self._get_all_files_with_same_basename(
+                basename, data_path, dataset_file_suffix
+            )
             self.dataset += files
 
         (
@@ -148,7 +153,9 @@ class GreatestHitDataset(Dataset):
         return item
 
     @staticmethod
-    def _get_all_files_with_same_basename(basename: str, data_dir: Path, suffix: str = ".mp4") -> list:
+    def _get_all_files_with_same_basename(
+        basename: str, data_dir: Path, suffix: str = ".mp4"
+    ) -> list:
         all_files = data_dir.glob(f"{basename}_denoised*")
         return [
             f.name for f in list(all_files) if f.suffix == suffix
