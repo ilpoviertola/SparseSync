@@ -95,8 +95,8 @@ model:
 
 training:
   base_learning_rate: 5e-6
-  base_batch_size: 10
-  num_workers: 8
+  base_batch_size: 32
+  num_workers: 32
   num_epochs: 10000
   patience: 140
   to_max_metric: True
