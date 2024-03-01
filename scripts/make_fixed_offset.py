@@ -91,7 +91,7 @@ def main(cfg: DictConfig):
                     .replace(".mp4", "")
                 )
 
-        elif "/greatesthits/" in vids_path:
+        elif "/greatesthit/" in vids_path:
             suffix = "_greatesthit"
 
             def _get_unique_id(path):

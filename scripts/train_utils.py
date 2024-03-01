@@ -155,6 +155,19 @@ def get_datasets(cfg, transforms):
 #     }
 
 
+def get_transforms_post(cfg):
+    transforms = {}
+    for mode in ["train", "test"]:
+        ts_cfg = cfg.get(f"transform_sequence_{mode}_post", None)
+        ts = (
+            [lambda x: x]
+            if ts_cfg is None
+            else [instantiate_from_config(c) for c in ts_cfg]
+        )
+        transforms[mode] = torchvision.transforms.Compose(ts)
+    return transforms
+
+
 def get_batch_sizes(cfg, num_gpus):
     train_B = cfg.training.base_batch_size
     return {
@@ -450,9 +463,9 @@ def prepare_inputs(batch, device, phase=None):
 def apply_batch_mixup(x, alpha):
     if alpha > 0.0:
         B = x.shape[0]
-        perm_idx = torch.randperm(B)
+        perm_idx = torch.tensor([1, 0]) # torch.randperm(B)
         # lmbd = torch.distributions.Beta(alpha, alpha).sample()  # this is not what we need
-        lmbd = torch.distributions.Uniform(low=0.0, high=alpha).sample()
+        lmbd = 0.5 # torch.distributions.Uniform(low=0.0, high=alpha).sample()
         return lmbd * x + (1 - lmbd) * x[perm_idx, ...]
     else:
         return x

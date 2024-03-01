@@ -7,14 +7,14 @@ model:
       is_trainable: True
       target: model.modules.feature_extractors.ResNetAudio
       params:
-        ckpt_path: /scratch/project_2004994/viertoli/logs/sync/feature_extractors/24-02-07T10-15-40/24-02-07T10-15-40.pt
+        ckpt_path: ./logs/feature_extractors/24-01-19T15-47-48/24-01-19T15-47-48.pt
         arch_name: 'resnet18'
         num_classes: 2
-        extract_features: true
     vfeat_extractor:
       is_trainable: True
       target: model.modules.feature_extractors.S3DVisualFeatures
       params:
+        # ckpt_path: null
         ckpt_path: ./model/modules/feat_extractors/visual/S3D_kinetics400_torchified.pt
     a_bridge_cfg:
       target: model.modules.bridges.DoNothingBridge
@@ -30,7 +30,7 @@ model:
     transformer:
       target: model.modules.feature_selector.SparseSync
       params:
-        num_offset_cls: 2  # e.g. 21 for (-2.0, -1.8, ..., 0.0, ..., 1.8, 2.0)
+        num_offset_cls: 21  # e.g. 21 for (-2.0, -1.8, ..., 0.0, ..., 1.8, 2.0)
         visual_block_shape: [6, 7, 7] # see the output of the feature_extractors [50, 7, 7] - rn; [16, 7, 7] - s3d; [50, 14, 14] - vit
         audio_block_shape: [9, 12] # see the output of the feature_extractors
         pre_norm_cfg:
@@ -124,11 +124,10 @@ training:
 data:
   crop_len_sec: 2
   max_off_sec: 2
-  vids_path: /scratch/project_2004994/viertoli/datasets/greatesthit/vis-data-256_h264_video_25fps_256side_24000hz_aac_len_5_splitby_random # something that ends with 'CODEC_video_XXfps_YYYside_ZZZZZhz' or '..._25fps_...'
+  vids_path: /scratch/project_2004994/viertoli/datasets/greatesthit/vis-data-256_h264_video_25fps_256side_24000hz_aac_len_5_splitby_random  # something that ends with 'CODEC_video_XXfps_YYYside_ZZZZZhz' or '..._25fps_...'
   size_before_crop: 256  # video resolution -> size_before_crop resolution -> input_size (crop resolution)
   input_size: 224
   do_offset: True
-  num_offset_cls: 24
   p_color_jitter: 0.0  # ignored if 0 # ignored if 0
   p_gray_scale: 0.0  # ignored if 0
   sometimes_upscale_p: 0.0  # how often to apply the smaller crop and upscale? if 0.0 or null, works as RGBSpatialCrop
@@ -166,8 +165,8 @@ transform_sequence_train:
       max_off_sec: ${data.max_off_sec}
       max_wiggle_sec: ${data.audio_jitter_sec}
       do_offset: ${data.do_offset}
-      grid_type: 'uniform_2cls' # uniform linspace
-      grid_size: ${data.num_offset_cls}
+      grid_type: 'linspace' # uniform linspace
+      grid_size: ${model.params.transformer.params.num_offset_cls}
   - target: dataset.transforms.RandomApplyColorDistortion
     params:
       p_color_jitter: ${data.p_color_jitter}
@@ -241,8 +240,8 @@ transform_sequence_test:
       crop_len_sec: ${data.crop_len_sec}
       max_off_sec: ${data.max_off_sec}
       do_offset: ${data.do_offset}
-      grid_type: 'uniform_2cls' # uniform linspace
-      grid_size: ${data.num_offset_cls}
+      grid_type: 'linspace' # uniform linspace
+      grid_size: ${model.params.transformer.params.num_offset_cls}
   - target: dataset.transforms.FreezeFrames
     params:
       max_off_sec: ${data.max_off_sec}
@@ -264,7 +263,7 @@ transform_sequence_test:
       n_fft: 512
       hop_length: 128  # n_fft // 4
   - target: dataset.transforms.AudioLog
-  # - target: dataset.transforms.AudioStandardNormalize
+  - target: dataset.transforms.AudioStandardNormalize
   - target: dataset.transforms.AudioUnsqueezeChannelDim
     params:
       dim: 0
